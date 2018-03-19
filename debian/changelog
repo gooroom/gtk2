@@ -1,3 +1,14 @@
+gtk+2.0 (2.24.31-2+grm1u1) unstable; urgency=medium
+
+  [ cjheo ]
+  * [a45c4905] Adding the patch to disable entry completion popup in GtkFileChooserDialog
+  * [0352e77f] Adding the patch to prevent from accessing system directory using pathbar in GtkFileChooserDialog
+  * [7358c65b] Adding the patch to prevent from accessing system directory in GtkFileChooserDialog
+
+  [ Gooroom Autobuilder ]
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Mon, 19 Mar 2018 17:00:29 +0900
+
 gtk+2.0 (2.24.31-2) unstable; urgency=medium
 
   * debian/patches/0001-Don-t-use-guint32-with-XChangeProperty.patch:
