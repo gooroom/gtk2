@@ -1,0 +1,72 @@
+diff --git a/gtk/gtkfilechooserdefault.c b/gtk/gtkfilechooserdefault.c
+index db097d4..3be93a4 100644
+--- a/gtk/gtkfilechooserdefault.c
++++ b/gtk/gtkfilechooserdefault.c
+@@ -1998,6 +1998,24 @@ shortcuts_add_volumes (GtkFileChooserDefault *impl)
+ 
+       volume = l->data;
+ 
++      GFile *root_file = _gtk_file_system_volume_get_root (volume);
++      if (root_file)
++        {
++          gchar *uri = g_file_get_uri (root_file);
++          if (uri)
++            {
++              if (g_str_equal (uri, "file:///"))
++                {
++                  g_free (uri);
++                  g_object_unref (root_file);
++                  continue;
++                }
++            }
++
++          g_free (uri);
++          g_object_unref (root_file);
++        }
++
+       if (impl->local_only)
+ 	{
+ 	  if (_gtk_file_system_volume_is_mounted (volume))
+@@ -2220,7 +2238,7 @@ shortcuts_model_create (GtkFileChooserDefault *impl)
+   
+   if (impl->file_system)
+     {
+-      shortcuts_append_cwd (impl);
++//      shortcuts_append_cwd (impl);
+       shortcuts_append_home (impl);
+       shortcuts_append_desktop (impl);
+       shortcuts_add_volumes (impl);
+@@ -7282,6 +7300,33 @@ gtk_file_chooser_default_update_current_folder (GtkFileChooser    *chooser,
+ 
+   operation_mode_set (impl, OPERATION_MODE_BROWSE);
+ 
++  gchar *uri = g_file_get_uri (file);
++  gchar *home_uri = g_strdup_printf ("file://%s", g_get_home_dir ());
++  gchar *media_uri = g_strdup_printf ("file:///media/%s", g_get_user_name ());
++  const gchar *trash_uri = "trash:///";
++  const gchar *network_uri = "network:///";
++
++  if (!g_str_has_prefix (uri, home_uri) &&
++      !g_str_has_prefix (uri, media_uri) &&
++      !g_str_has_prefix (uri, trash_uri) &&
++      !g_str_has_prefix (uri, network_uri))
++    {
++      g_set_error_literal (error,
++                           G_IO_ERROR,
++                           G_IO_ERROR_PERMISSION_DENIED,
++                           "");
++      g_free (uri);
++      g_free (home_uri);
++      g_free (media_uri);
++      g_object_unref (file);
++      profile_end ("end - access denied", NULL);
++      return FALSE;
++    }
++
++  g_free (uri);
++  g_free (home_uri);
++  g_free (media_uri);
++
+   if (impl->local_only && !_gtk_file_has_native_path (file))
+     {
+       g_set_error_literal (error,
