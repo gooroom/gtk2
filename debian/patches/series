@@ -12,3 +12,5 @@
 098_multiarch_module_path.patch
 0001-Don-t-use-guint32-with-XChangeProperty.patch
 0002-GtkMenuShell-always-activate-menu-shells.patch
+
+gooroom-disable-entry-completion-popup-in-GtkFileChooserDialog.patch
