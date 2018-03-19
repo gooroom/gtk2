@@ -14,3 +14,4 @@
 0002-GtkMenuShell-always-activate-menu-shells.patch
 
 gooroom-disable-entry-completion-popup-in-GtkFileChooserDialog.patch
+gooroom-remove-system-directory-from-pathbar-in-GtkFileChooserDialog.patch
