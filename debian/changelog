@@ -1,13 +1,110 @@
-gtk+2.0 (2.24.31-2+grm1u1) unstable; urgency=medium
+gtk+2.0 (2.24.32-3) unstable; urgency=medium
 
-  [ cjheo ]
-  * [a45c4905] Adding the patch to disable entry completion popup in GtkFileChooserDialog
-  * [0352e77f] Adding the patch to prevent from accessing system directory using pathbar in GtkFileChooserDialog
-  * [7358c65b] Adding the patch to prevent from accessing system directory in GtkFileChooserDialog
+  * Team upload
 
-  [ Gooroom Autobuilder ]
+  [ Hugh McMaster ]
+  * debian/control.in:
+    - Mark libgtk2.0-dev Multi-Arch: same (Closes: #689097).
+    - Mark gir1.2-gtk-2.0 Multi-Arch: same.
+  * gir1.2-gtk-2.0:
+    - Install the typelibs into an arch-specific libdir (Closes: #898111).
+  * libgtk2.0-dev:
+    - Add multi-arch support by no longer packaging the deprecated
+      dh_gtkmodules script (Closes: #875728).
 
- -- Gooroom Autobuilder <jenkins@gooroom.kr>  Mon, 19 Mar 2018 17:00:29 +0900
+  [ Simon McVittie ]
+  * d/patches: Update to upstream gtk-2-24 branch, commit
+    2.24.32-32-geec3ce0b4e
+    - Includes patch from Chris Lamb to make immodules.cache reproducible
+      (Closes: #872729)
+  * d/copyright: Update
+  * Stop installing stub ChangeLog as per Policy §12.7 (we install NEWS,
+    which contains user-facing release notes, instead)
+  * d/copyright: Update
+
+ -- Simon McVittie <smcv@debian.org>  Tue, 21 Aug 2018 14:33:00 +0100
+
+gtk+2.0 (2.24.32-2) unstable; urgency=medium
+
+  * Team upload
+
+  [ Jeremy Bicha ]
+  * Modify 015_default-fallback-icon-theme.patch
+    - Set fallback icon theme to Adwaita instead of gnome to match gtk3
+  * d/control: Depend on adwaita-icon-theme | gnome-icon-theme instead of
+    the reverse order
+
+  [ Simon McVittie ]
+  * d/patches: Add DEP-3 patch metadata and convert existing metadata
+    to gbp pq format
+  * d/p/001_static-linking-dont-query-immodules.patch:
+    Update to the latest version that was proposed upstream (in 2007)
+    - d/p/002_static-linking-dont-build-perf.patch: Adjust for
+      different AM_CONDITIONAL
+  * d/p/022_disable-viqr-im-for-vi-locale.patch:
+    Add reference to Ubuntu bug 191451, summarize the reason why this
+    is applied, and correctly attribute the patch to Ming Hua
+    (see #895043)
+  * d/p/m4macros-Set-a-serial-number.patch:
+    Add patch from upstream to give gtk-2.0.m4 a serial number so that
+    it will override older copies bundled with other packages, typically
+    in the m4 directory (Closes: #895018)
+
+ -- Simon McVittie <smcv@debian.org>  Wed, 27 Jun 2018 10:58:03 +0100
+
+gtk+2.0 (2.24.32-1) unstable; urgency=medium
+
+  * New upstream release
+  * debian/libgtk2.0-0.symbols: Add symbols
+  * Update Vcs fields for migration to https://salsa.debian.org/
+  * Drop patches applied in new release:
+    - 0001-Don-t-use-guint32-with-XChangeProperty.patch
+    - 0002-GtkMenuShell-always-activate-menu-shells.patch
+
+ -- Jeremy Bicha <jbicha@debian.org>  Sat, 20 Jan 2018 07:46:38 -0500
+
+gtk+2.0 (2.24.31-5) unstable; urgency=medium
+
+  * Update Vcs fields for conversion to git
+  * Add debian/gbp.conf
+  * Bump Standards-Version to 4.1.2
+
+ -- Jeremy Bicha <jbicha@debian.org>  Thu, 21 Dec 2017 14:05:20 -0500
+
+gtk+2.0 (2.24.31-4) unstable; urgency=medium
+
+  * Don't have gtk2-engines-pixbuf depend on libgtk2.0-0 to allow
+    themes to be installed without requiring GTK+ 2 to be installed.
+  * Drop new unnecessary recommends since we are handling the gtk+2.0
+    dependency issue directly in the packages:
+    - gnome-themes-standard
+    - ibus-gtk
+    - libcaribou-gtk-module
+
+ -- Jeremy Bicha <jbicha@debian.org>  Wed, 06 Dec 2017 10:03:47 -0500
+
+gtk+2.0 (2.24.31-3) unstable; urgency=medium
+
+  [ Jeremy Bicha ]
+  * Add recommends as part of effort to not install gtk+2.0 by default:
+    - gnome-themes-standard
+    - ibus-gtk
+    - libcaribou-gtk-module
+
+  [ Simon McVittie ]
+  * gir1.2-gtk-2.0: Add Provides for gir1.2-gdk-2.0, gir1.2-gdkx11-2.0
+    to reflect all typelibs shipped by this package
+  * Set Rules-Requires-Root to no
+  * Move udebs and examples from deprecated Priority: extra to
+    Priority: optional
+  * Use debhelper compat level 10
+    - Do not explicitly depend on dh-autoreconf or autotools-dev
+  * Use automatic -dbgsym packages for debug symbols
+  * Add Lintian overrides for package-name-doesnt-match-sonames
+    and symbols-declares-dependency-on-other-package, which reflect
+    deliberate maintainer choices
+
+ -- Jeremy Bicha <jbicha@debian.org>  Tue, 28 Nov 2017 12:54:38 -0500
 
 gtk+2.0 (2.24.31-2) unstable; urgency=medium
 

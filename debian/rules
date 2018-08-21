@@ -66,13 +66,12 @@ DEV_PKG := libgtk$(APIVER)-dev
 UDEB_PKG := $(SHARED_PKG)-udeb
 DOC_PKG := libgtk$(APIVER)-doc
 BIN_PKG := libgtk$(APIVER)-bin
-DEBUG_PKG := $(SHARED_PKG)-dbg
 EXAMPLES_PKG := gtk$(APIVER)-examples
 PIXBUF_PKG := gtk2-engines-pixbuf
 
 # package groups, used in rule dependencies and in cleanup
 BINARY_INDEP_PKGS := $(COMMON_PKG) $(DOC_PKG) libgail-doc
-BINARY_ARCH_PKGS := $(SHARED_PKG) $(BIN_PKG) $(UDEB_PKG) $(DEV_PKG) $(DEBUG_PKG) $(EXAMPLES_PKG) $(PIXBUF_PKG) gir1.2-gtk-2.0 libgail18 libgail18-udeb libgail-dbg libgail-dev libgail-common
+BINARY_ARCH_PKGS := $(SHARED_PKG) $(BIN_PKG) $(UDEB_PKG) $(DEV_PKG) $(EXAMPLES_PKG) $(PIXBUF_PKG) gir1.2-gtk-2.0 libgail18 libgail18-udeb libgail-dbg libgail-dev libgail-common
 ALL_PKGS := $(BINARY_INDEP_PKGS) $(BINARY_ARCH_PKGS)
 
 # list of flavors we build; each gets a builddir, a configure pass (configure
@@ -221,7 +220,6 @@ debian/%: debian/%.in
 		-e "s#@UDEB_PKG@#$(UDEB_PKG)#g" \
 		-e "s#@DOC_PKG@#$(DOC_PKG)#g" \
 		-e "s#@BIN_PKG@#$(BIN_PKG)#g" \
-		-e "s#@DEBUG_PKG@#$(DEBUG_PKG)#g" \
 		-e "s#@EXAMPLES_PKG@#$(EXAMPLES_PKG)#g" \
 		-e "s#@PIXBUF_PKG@#$(PIXBUF_PKG)#g" \
 		-e "s#@GNOME_TEAM@#$(UPLOADERS)#g" \
@@ -253,7 +251,7 @@ binary-indep: build-indep install-indep $(call dh_subst_files,$(BINARY_INDEP_PKG
 	dh_testroot
 	dh_install -i
 	# changelog.gz symlinks will be overwritten by dh_link
-	dh_installchangelogs -i ChangeLog
+	dh_installchangelogs -i -XChangeLog
 	# do not merge the calls: dh_installdocs will only install some files
 	# in the first package
 	dh_installdocs -p$(COMMON_PKG) $(DH_INSTALLDOCS_FILES)
@@ -275,15 +273,15 @@ binary-arch: build-arch $(maybe_check) install-arch $(call dh_subst_files,$(BINA
 	dh_testroot
 	dh_install -s
 	# changelog.gz symlinks will be overwritten by dh_link
-	dh_installchangelogs -s ChangeLog
+	dh_installchangelogs -s -XChangeLog
 	# install copyright in all packages; the -p is for the special behavior
 	# of dh_installdocs (ship README.Debian etc. in the first package)
 	dh_installdocs -p$(PIXBUF_PKG) -s
 	dh_installman -s
 	dh_installexamples -s
 	dh_link -s
-	dh_strip -s --dbg-package=$(DEBUG_PKG) -N$(UDEB_PKG) -Nlibgail18 -Nlibgail18-udeb -Nlibgail-common
-	dh_strip -plibgail18 -plibgail-common --dbg-package=libgail-dbg
+	dh_strip -s --dbgsym-migration="libgtk2.0-0-dbg (<< 2.24.31-3~)" -N$(UDEB_PKG) -Nlibgail18 -Nlibgail18-udeb -Nlibgail-common
+	dh_strip -plibgail18 -plibgail-common --dbgsym-migration="libgail-dbg (<< 2.24.31-3~)"
 	dh_strip -p$(UDEB_PKG) -plibgail18-udeb
 	dh_compress -s -X.sgml -X.devhelp
 	dh_fixperms -s -X$(LIBDIR)/$(SHARED_PKG)
@@ -299,7 +297,10 @@ binary-arch: build-arch $(maybe_check) install-arch $(call dh_subst_files,$(BINA
 		-- -c4
 	dh_girepository -pgir1.2-gtk-2.0
 	dh_installdeb -s
-	dh_shlibdeps
+	dh_shlibdeps -p$(PIXBUF_PKG) -- -xlibgtk2.0-0
+	# --remaining-packages didn't work right so let's at least make sure
+	# it doesn't run a second time for the pixbuf .so
+	dh_shlibdeps --remaining-packages -Xlibpixmap.so
 	dh_gencontrol -s
 	dh_md5sums -s
 	dh_builddeb -s -- -Zxz
