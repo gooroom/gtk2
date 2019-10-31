@@ -1,0 +1,80 @@
+From fe9e2ee62f1b093779bcf28dd4161b612c1da308 Mon Sep 17 00:00:00 2001
+From: donghun <donghun@gooroom.kr>
+Date: Wed, 27 Nov 2019 11:07:54 +0900
+Subject: [PATCH] prevent from accessing system directory in gtkfilesystem
+
+---
+ gtk/gtkfilesystem.c | 36 ++++++++++++++++++++++++++++++++----
+ 1 file changed, 32 insertions(+), 4 deletions(-)
+
+diff --git a/gtk/gtkfilesystem.c b/gtk/gtkfilesystem.c
+index 5f9e054..103da0a 100644
+--- a/gtk/gtkfilesystem.c
++++ b/gtk/gtkfilesystem.c
+@@ -51,6 +51,7 @@
+  */
+ static const gchar *root_volume_token = N_("File System");
+ #define IS_ROOT_VOLUME(volume) ((gpointer) (volume) == (gpointer) root_volume_token)
++#define IS_SYSTEM_ROOT_VOLUME(mount) (is_file_system_root (mount))
+ 
+ enum {
+   PROP_0,
+@@ -424,6 +425,24 @@ mount_referenced_by_volume_activation_root (GList *volumes, GMount *mount)
+   return ret;
+ }
+ 
++static gboolean
++is_file_system_root (GMount *mount)
++{
++  gboolean ret = FALSE;
++
++  if (!mount)
++      return ret;
++
++  GFile *file = g_mount_get_default_location (mount);
++  char *path = g_file_get_path (file);
++
++  if (g_strcmp0 (path, "/") == 0)
++      ret = TRUE;
++
++  g_free (path);
++  return ret;
++}
++
+ static void
+ get_volumes_list (GtkFileSystem *file_system)
+ {
+@@ -519,6 +538,15 @@ get_volumes_list (GtkFileSystem *file_system)
+ 
+       mount = g_volume_get_mount (volume);
+ 
++      if (IS_SYSTEM_ROOT_VOLUME (mount) || IS_ROOT_VOLUME (volume))
++        {
++           if (mount)
++            g_object_unref (mount);
++
++          g_object_unref (volume);
++          continue;
++        }
++
+       if (mount)
+         {
+           /* show this mount */
+@@ -648,10 +676,10 @@ _gtk_file_system_list_volumes (GtkFileSystem *file_system)
+ 
+   list = g_slist_copy (priv->volumes);
+ 
+-#ifndef G_OS_WIN32
+-  /* Prepend root volume */
+-  list = g_slist_prepend (list, (gpointer) root_volume_token);
+-#endif
++//#ifndef G_OS_WIN32
++//  /* Prepend root volume */
++//  list = g_slist_prepend (list, (gpointer) root_volume_token);
++//#endif
+ 
+   return list;
+ }
+-- 
+2.20.1
+
