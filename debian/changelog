@@ -1,3 +1,12 @@
+gtk+2.0 (2.24.32-3+grm2u1) unstable; urgency=medium
+
+  [ donghun ]
+  * [f4406e9b] Adding the patch to prevent from accessing system directory in gtkfilesystem
+
+  [ Gooroom Autobuilder ]
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Sun, 01 Dec 2019 19:49:46 +0900
+
 gtk+2.0 (2.24.32-3) unstable; urgency=medium
 
   * Team upload
